@@ -548,7 +548,7 @@ async function refreshPrices(){
 
   // Mark all priceable positions as loading
   positions.forEach(p=>{ if(p.shares!=null&&p.fixed_value==null) priceStatus[p.ticker.toUpperCase()]='loading'; });
-  renderTable(); renderCards();
+  if(isMobileView) renderMobile(); else renderTable();
 
   const equityTickers=[...new Set(
     positions.filter(p=>p.shares!=null&&p.fixed_value==null&&!CRYPTO_IDS[p.ticker.toUpperCase()])
