@@ -203,8 +203,13 @@ tr:last-child td{border-bottom:none;}
 .mobile-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 0 20px;}
 .mobile-table-wrap table{width:100%;border-collapse:collapse;font-size:13px;}
 .mobile-table-wrap thead tr{border-bottom:1px solid var(--border2);}
-.mobile-table-wrap th{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:10px 12px;text-align:left;white-space:nowrap;background:var(--bg);position:sticky;top:0;}
+.mobile-table-wrap th{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:10px 12px;text-align:left;white-space:nowrap;background:var(--bg);position:sticky;top:0;user-select:none;}
 .mobile-table-wrap th.r{text-align:right;}
+.mobile-table-wrap th.msort{cursor:pointer;}
+.mobile-table-wrap th.msort:hover{color:var(--text);}
+.mobile-table-wrap th.msorted{color:var(--accent);}
+.mobile-table-wrap th .msi{display:inline-block;margin-left:3px;opacity:0.3;font-size:8px;}
+.mobile-table-wrap th.msorted .msi{opacity:1;color:var(--accent);}
 .mobile-table-wrap td{padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
 .mobile-table-wrap tr:last-child td{border-bottom:none;}
 .mobile-table-wrap tr:active td{background:var(--surface);}
@@ -471,6 +476,7 @@ let positions   = [];
 let priceStatus = {}; // ticker -> 'ok'|'err'|'none'
 let colVis      = JSON.parse(localStorage.getItem('pt_colvis5')||'{}');
 let sortCol     = 'value', sortDir = -1;
+let mobileSortCol = 'value', mobileSortDir = -1;
 let filterB     = 'all', searchQ = '';
 let lastUpdated = null, editingId = null;
 let isMobileView = window.innerWidth <= 430; // auto-detect on load
@@ -772,15 +778,20 @@ let _rsz=null;
 let colWidths=JSON.parse(localStorage.getItem('pt_colwidths')||'{}');
 let colWidthsMobile=JSON.parse(localStorage.getItem('pt_colwidths_m')||'{}');
 const MCOLS=[
-  {label:'Ticker',r:false},{label:'Qty',r:true},{label:'Price',r:true},
-  {label:'Value',r:true},{label:'Action',r:false},{label:'Notes',r:false},
+  {label:'Ticker',r:false,sort:'ticker'},{label:'Qty',r:true,sort:'shares'},{label:'Price',r:true,sort:'price'},
+  {label:'Value',r:true,sort:'value'},{label:'Action',r:false,sort:'action'},{label:'Notes',r:false,sort:null},
 ];
 function renderMobileThead(){
-  document.getElementById('mobile-thead').innerHTML='<tr>'+MCOLS.map((c,i)=>`
-    <th class="${c.r?'r':''}">
-      ${c.label}
+  document.getElementById('mobile-thead').innerHTML='<tr>'+MCOLS.map((c,i)=>{
+    const isSorted=c.sort&&mobileSortCol===c.sort;
+    const cls=[c.r?'r':'',c.sort?'msort':'',isSorted?'msorted':''].filter(Boolean).join(' ');
+    const sortInd=c.sort?`<span class="msi">${isSorted?(mobileSortDir===1?'↑':'↓'):'↕'}</span>`:'';
+    const clickAttr=c.sort?`onclick="doMobileSort('${c.sort}')"`:''
+    return `<th class="${cls}" ${clickAttr}>
+      ${c.label}${sortInd}
       <div class="col-rsz" onmousedown="startMobileResize(event,this.parentElement,${i})" ontouchstart="startMobileResize(event,this.parentElement,${i})"></div>
-    </th>`).join('')+'</tr>';
+    </th>`;
+  }).join('')+'</tr>';
   document.querySelectorAll('#mobile-thead th').forEach((th,i)=>{ const w=colWidthsMobile[i]; if(w){th.style.minWidth=w+'px';th.style.width=w+'px';} });
 }
 function startMobileResize(e,th,ci){
@@ -939,11 +950,23 @@ function renderMobileBuckets(){
     }).join('');
 }
 
+function doMobileSort(col){
+  if(mobileSortCol===col) mobileSortDir*=-1; else{mobileSortCol=col;mobileSortDir=-1;}
+  renderMobileThead(); renderMobileTable();
+}
+
 function renderMobileTable(){
   let data=[...positions];
   if(filterB!=='all') data=data.filter(p=>p.bucket===filterB);
   if(searchQ){ const q=searchQ.toLowerCase(); data=data.filter(p=>[p.ticker,p.account,p.bucket].some(s=>(s||'').toLowerCase().includes(q))); }
-  data.sort((a,b)=>(b.value||0)-(a.value||0));
+  data.sort((a,b)=>{
+    let av=a[mobileSortCol],bv=b[mobileSortCol];
+    if(av===null||av===undefined) av=mobileSortDir===1?Infinity:-Infinity;
+    if(bv===null||bv===undefined) bv=mobileSortDir===1?Infinity:-Infinity;
+    if(typeof av==='string') av=av.toLowerCase();
+    if(typeof bv==='string') bv=bv.toLowerCase();
+    return av<bv?-mobileSortDir:av>bv?mobileSortDir:0;
+  });
 
   const tbody=document.getElementById('mobile-tbody');
   const empty=document.getElementById('mobile-empty');
