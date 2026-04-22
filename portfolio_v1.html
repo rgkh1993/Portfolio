@@ -260,6 +260,13 @@ select.minput option{background:var(--surface2);}
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
 
+/* ── COL RESIZE ── */
+th{position:relative;}
+.col-rsz{position:absolute;right:-6px;top:0;bottom:0;width:20px;cursor:col-resize;z-index:10;touch-action:none;display:flex;align-items:center;justify-content:center;}
+.col-rsz::after{content:'';width:2px;height:55%;background:var(--border2);border-radius:1px;pointer-events:none;transition:background 0.15s;}
+.col-rsz:hover::after{background:var(--accent);}
+.col-rsz.rsz-active::after{background:var(--accent);}
+
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
   .summary-bar{grid-template-columns:repeat(3,1fr);}
@@ -348,14 +355,7 @@ select.minput option{background:var(--surface2);}
   <div class="mobile-buckets" id="mobile-buckets"></div>
   <div class="mobile-table-wrap">
     <table>
-      <thead><tr>
-        <th>Ticker</th>
-        <th class="r">Qty</th>
-        <th class="r">Price</th>
-        <th class="r">Value</th>
-        <th>Action</th>
-        <th>Notes</th>
-      </tr></thead>
+      <thead id="mobile-thead"></thead>
       <tbody id="mobile-tbody"></tbody>
     </table>
     <div class="empty" id="mobile-empty" style="display:none;padding:40px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:11px">No positions match.</div>
@@ -549,7 +549,6 @@ async function refreshPrices(){
   // Mark all priceable positions as loading
   positions.forEach(p=>{ if(p.shares!=null&&p.fixed_value==null) priceStatus[p.ticker.toUpperCase()]='loading'; });
   if(isMobileView) renderMobile(); else renderTable();
-
   const equityTickers=[...new Set(
     positions.filter(p=>p.shares!=null&&p.fixed_value==null&&!CRYPTO_IDS[p.ticker.toUpperCase()])
              .map(p=>p.ticker.toUpperCase())
@@ -659,6 +658,10 @@ function applyView(){
   const lbl=document.getElementById('view-label');
   const colsBtn=document.getElementById('cols-btn');
   const controls=document.getElementById('controls');
+  const summaryBar=document.getElementById('summary-bar');
+  const allocBar=document.getElementById('alloc-bar');
+  const slabelRow=document.querySelector('.slabel-row');
+  const bucketRow=document.getElementById('bucket-row');
   if(isMobileView){
     twrap.classList.add('hidden');
     mv.classList.add('active');
@@ -666,6 +669,10 @@ function applyView(){
     lbl.textContent='Desktop View';
     colsBtn.style.display='none';
     controls.style.display='none';
+    summaryBar.style.display='none';
+    allocBar.style.display='none';
+    slabelRow.style.display='none';
+    bucketRow.style.display='none';
     renderMobile();
   } else {
     twrap.classList.remove('hidden');
@@ -674,6 +681,10 @@ function applyView(){
     lbl.textContent='Mobile View';
     colsBtn.style.display='';
     controls.style.display='';
+    summaryBar.style.display='';
+    allocBar.style.display='';
+    slabelRow.style.display='';
+    bucketRow.style.display='';
     renderTable();
   }
 }
@@ -756,6 +767,65 @@ function priceDot(ticker){
   return `<span class="price-dot ${map[st]}" title="${title[st]}"></span>`;
 }
 
+// ─── COLUMN RESIZE ───────────────────────────────────────────────────────────
+let _rsz=null;
+let colWidths=JSON.parse(localStorage.getItem('pt_colwidths')||'{}');
+let colWidthsMobile=JSON.parse(localStorage.getItem('pt_colwidths_m')||'{}');
+const MCOLS=[
+  {label:'Ticker',r:false},{label:'Qty',r:true},{label:'Price',r:true},
+  {label:'Value',r:true},{label:'Action',r:false},{label:'Notes',r:false},
+];
+function renderMobileThead(){
+  document.getElementById('mobile-thead').innerHTML='<tr>'+MCOLS.map((c,i)=>`
+    <th class="${c.r?'r':''}">
+      ${c.label}
+      <div class="col-rsz" onmousedown="startMobileResize(event,this.parentElement,${i})" ontouchstart="startMobileResize(event,this.parentElement,${i})"></div>
+    </th>`).join('')+'</tr>';
+  document.querySelectorAll('#mobile-thead th').forEach((th,i)=>{ const w=colWidthsMobile[i]; if(w){th.style.minWidth=w+'px';th.style.width=w+'px';} });
+}
+function startMobileResize(e,th,ci){
+  e.preventDefault(); e.stopPropagation();
+  const x=e.touches?e.touches[0].clientX:e.clientX;
+  _rsz={th,startX:x,startW:th.offsetWidth,ci,mobile:true};
+  th.querySelector('.col-rsz')?.classList.add('rsz-active');
+  document.addEventListener('mousemove',onRszMove);
+  document.addEventListener('mouseup',onRszEnd);
+  document.addEventListener('touchmove',onRszMove,{passive:false});
+  document.addEventListener('touchend',onRszEnd);
+}
+function startResize(e,th,ci){
+  e.preventDefault(); e.stopPropagation();
+  const x=e.touches?e.touches[0].clientX:e.clientX;
+  _rsz={th,startX:x,startW:th.offsetWidth,ci};
+  th.querySelector('.col-rsz')?.classList.add('rsz-active');
+  document.addEventListener('mousemove',onRszMove);
+  document.addEventListener('mouseup',onRszEnd);
+  document.addEventListener('touchmove',onRszMove,{passive:false});
+  document.addEventListener('touchend',onRszEnd);
+}
+function onRszMove(e){
+  if(!_rsz) return; e.preventDefault();
+  const x=e.touches?e.touches[0].clientX:e.clientX;
+  const w=Math.max(40,_rsz.startW+(x-_rsz.startX));
+  _rsz.th.style.minWidth=w+'px'; _rsz.th.style.width=w+'px';
+}
+function onRszEnd(){
+  if(!_rsz) return;
+  if(_rsz.mobile){
+    colWidthsMobile[_rsz.ci]=_rsz.th.offsetWidth;
+    localStorage.setItem('pt_colwidths_m',JSON.stringify(colWidthsMobile));
+  } else {
+    colWidths[_rsz.ci]=_rsz.th.offsetWidth;
+    localStorage.setItem('pt_colwidths',JSON.stringify(colWidths));
+  }
+  _rsz.th.querySelector('.col-rsz')?.classList.remove('rsz-active');
+  _rsz=null;
+  document.removeEventListener('mousemove',onRszMove);
+  document.removeEventListener('mouseup',onRszEnd);
+  document.removeEventListener('touchmove',onRszMove);
+  document.removeEventListener('touchend',onRszEnd);
+}
+
 // ─── DESKTOP TABLE ───────────────────────────────────────────────────────────
 function getFiltered(){
   let d=[...positions];
@@ -776,7 +846,9 @@ function renderThead(){
   document.getElementById('thead').innerHTML='<tr>'+COLS.map((c,i)=>`
     <th data-ci="${i}" class="${c.r?'r':''} ${c.sort?'sort':''} ${sortCol===c.id?'sorted':''}"
         ${c.sort?`onclick="doSort('${c.id}')"`:''}>
-      ${c.label}${c.sort?`<span class="si">${sortCol===c.id?(sortDir===1?'↑':'↓'):'↕'}</span>`:''}</th>`).join('')+'</tr>';
+      ${c.label}${c.sort?`<span class="si">${sortCol===c.id?(sortDir===1?'↑':'↓'):'↕'}</span>`:''}
+      ${c.id!=='del'?`<div class="col-rsz" onmousedown="startResize(event,this.parentElement,${i})" ontouchstart="startResize(event,this.parentElement,${i})"></div>`:''}</th>`).join('')+'</tr>';
+  document.querySelectorAll('#thead th').forEach((th,i)=>{ const w=colWidths[i]; if(w){th.style.minWidth=w+'px';th.style.width=w+'px';} });
 }
 
 function renderTable(){
@@ -915,6 +987,7 @@ function renderMobileTable(){
 function renderMobile(){
   renderMobileSummary();
   renderMobileBuckets();
+  renderMobileThead();
   renderMobileTable();
 }
 
