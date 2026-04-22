@@ -170,43 +170,56 @@ tr:last-child td{border-bottom:none;}
 .del-btn{background:transparent;border:none;color:var(--muted);cursor:pointer;padding:4px 6px;border-radius:3px;font-size:13px;line-height:1;transition:all 0.15s;}
 .del-btn:hover{color:var(--red);background:rgba(239,68,68,0.1);}
 
-/* ── MOBILE CARD VIEW ── */
-.mobile-view{display:none;padding:12px 16px 40px;}
+/* ── MOBILE VIEW ── */
+.mobile-view{display:none;padding-bottom:40px;}
 .mobile-view.active{display:block;}
 .twrap.hidden{display:none;}
-.controls.hidden-mobile{display:none;}
 
-.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.pos-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all 0.15s;position:relative;overflow:hidden;}
-.pos-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;border-radius:10px 0 0 10px;}
-.pos-card:hover{border-color:var(--border2);background:var(--surface2);}
-.pos-card:active{transform:scale(0.98);}
-.card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
-.card-ticker{font-family:var(--mono);font-weight:600;font-size:15px;color:var(--text);}
-.card-account{font-family:var(--mono);font-size:9px;color:var(--muted2);margin-top:2px;}
-.card-action{font-family:var(--mono);font-size:8px;font-weight:600;letter-spacing:0.1em;padding:2px 7px;border-radius:3px;border:1px solid;text-transform:uppercase;}
-.card-value{font-family:var(--mono);font-size:18px;font-weight:600;color:var(--text);letter-spacing:-0.02em;margin-bottom:4px;}
-.card-price-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
-.card-price{font-family:var(--mono);font-size:11px;color:var(--muted2);}
-.card-pl{font-family:var(--mono);font-size:12px;font-weight:500;}
-.card-pl.green{color:var(--green);}
-.card-pl.red{color:var(--red);}
-.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
-.card-pct{font-family:var(--mono);font-size:10px;color:var(--muted2);}
-.card-bucket{font-family:var(--mono);font-size:9px;letter-spacing:0.06em;padding:2px 6px;border-radius:3px;border:1px solid;}
+/* Mobile summary scrolls horizontally — same cards, smaller */
+.mobile-summary{display:flex;overflow-x:auto;gap:1px;background:var(--border);-webkit-overflow-scrolling:touch;}
+.mobile-summary::-webkit-scrollbar{display:none;}
+.mobile-scard{flex:0 0 130px;background:var(--surface);padding:12px 14px;cursor:pointer;border-top:2px solid transparent;transition:all 0.15s;}
+.mobile-scard:active{background:var(--surface2);}
+.mobile-scard.active{background:var(--surface2);}
+.ms-label{font-family:var(--mono);font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.ms-val{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--text);letter-spacing:-0.02em;}
+.ms-sub{font-size:9px;color:var(--muted2);margin-top:2px;}
+.ms-val.green{color:var(--green);}
+.ms-val.red{color:var(--red);}
+.ms-val.accent{color:var(--accent);}
 
-/* CARD EXPAND */
-.card-expand{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
-.card-expand.open{display:block;}
-.card-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;}
-.card-row-label{font-family:var(--mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);}
-.card-row-val{font-family:var(--mono);font-size:11px;color:var(--text);}
-.card-edit{background:transparent;border:1px solid var(--border2);border-radius:3px;padding:2px 6px;color:var(--text);font-family:var(--mono);font-size:11px;width:90px;text-align:right;outline:none;}
-.card-edit:focus{border-color:var(--accent);}
-.card-note{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:6px 8px;color:var(--muted2);font-family:var(--sans);font-size:11px;resize:none;outline:none;margin-top:6px;}
-.card-note:focus{border-color:var(--accent);color:var(--text);}
-.card-del{font-family:var(--mono);font-size:9px;color:var(--red);background:transparent;border:1px solid rgba(239,68,68,0.3);border-radius:4px;padding:4px 10px;cursor:pointer;margin-top:8px;width:100%;}
-.card-del:hover{background:rgba(239,68,68,0.1);}
+/* Mobile alloc bar */
+.mobile-alloc{height:3px;display:flex;}
+
+/* Mobile bucket pills — horizontal scroll */
+.mobile-buckets{display:flex;overflow-x:auto;gap:1px;background:var(--border);border-bottom:1px solid var(--border);-webkit-overflow-scrolling:touch;}
+.mobile-buckets::-webkit-scrollbar{display:none;}
+.mbucket{flex:0 0 auto;background:var(--surface);padding:8px 12px;cursor:pointer;white-space:nowrap;border-top:2px solid transparent;transition:background 0.15s;}
+.mbucket.active{background:var(--surface2);}
+.mbucket-name{font-family:var(--mono);font-size:8px;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:2px;}
+.mbucket-val{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text);}
+
+/* Mobile table */
+.mobile-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 0 20px;}
+.mobile-table-wrap table{width:100%;border-collapse:collapse;font-size:13px;}
+.mobile-table-wrap thead tr{border-bottom:1px solid var(--border2);}
+.mobile-table-wrap th{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:10px 12px;text-align:left;white-space:nowrap;background:var(--bg);position:sticky;top:0;}
+.mobile-table-wrap th.r{text-align:right;}
+.mobile-table-wrap td{padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.mobile-table-wrap tr:last-child td{border-bottom:none;}
+.mobile-table-wrap tr:active td{background:var(--surface);}
+
+/* Mobile table cells */
+.mt-ticker{font-family:var(--mono);font-weight:600;font-size:13px;color:var(--text);}
+.mt-sub{font-family:var(--mono);font-size:9px;color:var(--muted2);margin-top:1px;}
+.mt-num{font-family:var(--mono);font-size:12px;text-align:right;color:var(--text);}
+.mt-price{font-family:var(--mono);font-size:12px;text-align:right;color:var(--muted2);}
+.mt-price-wrap{display:flex;align-items:center;justify-content:flex-end;gap:5px;}
+
+/* Mobile note input */
+.mt-note{width:100%;min-width:120px;background:transparent;border:1px solid transparent;border-radius:3px;padding:3px 5px;color:var(--muted2);font-family:var(--sans);font-size:11px;resize:none;outline:none;transition:all 0.15s;line-height:1.4;min-height:22px;}
+.mt-note:focus{border-color:var(--border2);background:var(--surface2);color:var(--text);}
+.mt-note::placeholder{color:var(--muted);font-style:italic;}
 
 /* ── TOAST ── */
 .toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:12px 18px;font-family:var(--mono);font-size:11px;color:var(--text);box-shadow:0 8px 32px rgba(0,0,0,0.4);z-index:999;transform:translateY(80px);opacity:0;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);pointer-events:none;}
@@ -254,7 +267,6 @@ select.minput option{background:var(--surface2);}
 }
 @media(max-width:430px){
   .summary-bar{grid-template-columns:repeat(2,1fr);}
-  .card-grid{grid-template-columns:1fr;}
   .mgrid{grid-template-columns:1fr;}
   .mfield.full{grid-column:span 1;}
   .updated-info{display:none;}
@@ -329,9 +341,25 @@ select.minput option{background:var(--surface2);}
   <div class="empty" id="empty" style="display:none">No positions match.</div>
 </div>
 
-<!-- MOBILE CARD VIEW -->
+<!-- MOBILE VIEW -->
 <div class="mobile-view" id="mobile-view">
-  <div class="card-grid" id="card-grid"></div>
+  <div class="mobile-summary" id="mobile-summary"></div>
+  <div class="mobile-alloc" id="mobile-alloc"></div>
+  <div class="mobile-buckets" id="mobile-buckets"></div>
+  <div class="mobile-table-wrap">
+    <table>
+      <thead><tr>
+        <th>Ticker</th>
+        <th class="r">Qty</th>
+        <th class="r">Price</th>
+        <th class="r">Value</th>
+        <th>Action</th>
+        <th>Notes</th>
+      </tr></thead>
+      <tbody id="mobile-tbody"></tbody>
+    </table>
+    <div class="empty" id="mobile-empty" style="display:none;padding:40px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:11px">No positions match.</div>
+  </div>
 </div>
 
 <!-- MODAL -->
@@ -630,19 +658,22 @@ function applyView(){
   const btn=document.getElementById('view-btn');
   const lbl=document.getElementById('view-label');
   const colsBtn=document.getElementById('cols-btn');
+  const controls=document.getElementById('controls');
   if(isMobileView){
     twrap.classList.add('hidden');
     mv.classList.add('active');
     btn.classList.add('mobile-active');
     lbl.textContent='Desktop View';
     colsBtn.style.display='none';
-    renderCards();
+    controls.style.display='none';
+    renderMobile();
   } else {
     twrap.classList.remove('hidden');
     mv.classList.remove('active');
     btn.classList.remove('mobile-active');
     lbl.textContent='Mobile View';
     colsBtn.style.display='';
+    controls.style.display='';
     renderTable();
   }
 }
@@ -692,7 +723,7 @@ function renderFilters(){
     `<button class="fbtn${filterB==='all'?' active':''}" onclick="setFilter('all')">ALL</button>`+
     buckets.map(b=>`<button class="fbtn${filterB===b?' active':''}" onclick="setFilter('${b}')">${b}</button>`).join('');
 }
-function setFilter(b){ filterB=b; renderAll(); }
+function setFilter(b){ filterB=b; if(isMobileView){ renderMobileBuckets(); renderMobileTable(); } else renderAll(); }
 
 // ─── COLUMN DROPDOWN ─────────────────────────────────────────────────────────
 function buildColDd(){
@@ -788,71 +819,103 @@ function renderTable(){
 }
 function doSort(col){ if(sortCol===col) sortDir*=-1; else{sortCol=col;sortDir=-1;} renderThead(); renderTable(); }
 
-// ─── MOBILE CARDS ────────────────────────────────────────────────────────────
-function renderCards(){
+// ─── MOBILE VIEW ─────────────────────────────────────────────────────────────
+function renderMobileSummary(){
   const T=getTotal();
+  const inv=positions.filter(p=>p.value&&!['Cash','Home'].includes(p.bucket)).reduce((s,p)=>s+(p.value||0),0);
+  const cash=positions.filter(p=>p.bucket==='Cash'&&p.value).reduce((s,p)=>s+(p.value||0),0);
+  const crypto=positions.filter(p=>p.bucket==='Crypto'&&p.value).reduce((s,p)=>s+(p.value||0),0);
+  const eq=positions.filter(p=>!['Cash','Home','Crypto'].includes(p.bucket)&&p.value).reduce((s,p)=>s+(p.value||0),0);
+  const plPs=positions.filter(p=>p.pl_usd!=null);
+  const tpl=plPs.reduce((s,p)=>s+(p.pl_usd||0),0);
+
+  const cards=[
+    {label:'Total',    val:fD(T),    sub:`${positions.filter(p=>p.value).length} positions`, cls:'',      color:'#3b82f6'},
+    {label:'Invested', val:fD(inv),  sub:`${T?((inv/T)*100).toFixed(0):0}% deployed`,        cls:'accent',color:'#3b82f6'},
+    {label:'Cash',     val:fD(cash), sub:`${T?((cash/T)*100).toFixed(0):0}%`,                cls:'',      color:'#64748b'},
+    {label:'Equities', val:fD(eq),   sub:`${T?((eq/T)*100).toFixed(0):0}%`,                  cls:'',      color:'#8b5cf6'},
+    {label:'Crypto',   val:fD(crypto),sub:`${T?((crypto/T)*100).toFixed(0):0}%`,             cls:'',      color:'#f59e0b'},
+    {label:'P/L',      val:(tpl>=0?'+':'')+fD(tpl), sub:`${plPs.length} tracked`,            cls:tpl>=0?'green':'red', color:tpl>=0?'#10b981':'#ef4444'},
+  ];
+
+  document.getElementById('mobile-summary').innerHTML=cards.map(c=>`
+    <div class="mobile-scard" style="border-top-color:${c.color}">
+      <div class="ms-label">${c.label}</div>
+      <div class="ms-val ${c.cls}">${c.val}</div>
+      <div class="ms-sub">${c.sub}</div>
+    </div>`).join('');
+
+  // alloc bar
+  const bt=getBT();
+  document.getElementById('mobile-alloc').innerHTML=Object.entries(bt).sort((a,b)=>b[1]-a[1])
+    .map(([b,v])=>`<div style="flex:${(v/T)*100};background:${BC[b]?.color||'#4a5568'};height:100%"></div>`).join('');
+}
+
+function renderMobileBuckets(){
+  const T=getTotal(); const bt=getBT();
+  document.getElementById('mobile-buckets').innerHTML=
+    `<div class="mbucket${filterB==='all'?' active':''}" onclick="setFilter('all')" style="border-top-color:${filterB==='all'?'var(--accent)':'transparent'}">
+      <div class="mbucket-name" style="color:var(--muted2)">All</div>
+      <div class="mbucket-val">${fD(T)}</div>
+    </div>`+
+    Object.entries(bt).sort((a,b)=>b[1]-a[1]).map(([b,v])=>{
+      const cfg=BC[b]||{color:'#64748b'}; const isA=filterB===b;
+      return `<div class="mbucket${isA?' active':''}" onclick="setFilter('${b}')" style="border-top-color:${isA?cfg.color:'transparent'}">
+        <div class="mbucket-name" style="color:${cfg.color}">${b}</div>
+        <div class="mbucket-val">${fD(v)}</div>
+      </div>`;
+    }).join('');
+}
+
+function renderMobileTable(){
   let data=[...positions];
   if(filterB!=='all') data=data.filter(p=>p.bucket===filterB);
   if(searchQ){ const q=searchQ.toLowerCase(); data=data.filter(p=>[p.ticker,p.account,p.bucket].some(s=>(s||'').toLowerCase().includes(q))); }
   data.sort((a,b)=>(b.value||0)-(a.value||0));
 
-  const grid=document.getElementById('card-grid');
-  if(!data.length){ grid.innerHTML='<div class="empty">No positions match.</div>'; return; }
+  const tbody=document.getElementById('mobile-tbody');
+  const empty=document.getElementById('mobile-empty');
 
-  grid.innerHTML=data.map(p=>{
-    const cfg=BC[p.bucket]||{cls:'b-cash',color:'#64748b'};
-    const pct=p.value&&T?((p.value/T)*100).toFixed(1):'0.0';
-    const plUC=p.pl_usd!=null?(p.pl_usd>=0?'green':'red'):'';
-    const plTxt=p.pl_usd!=null?`${p.pl_usd>=0?'+':''}${fD(p.pl_usd)} (${p.pl_pct>=0?'+':''}${p.pl_pct?.toFixed(1)}%)`:'—';
+  if(!data.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+
+  tbody.innerHTML=data.map(p=>{
+    const cfg=BC[p.bucket]||{color:'#64748b'};
     const aCls=ACT_CLS[p.action]||'at-hold';
     const aLbl=ACT_LABELS[p.action]||'HOLD';
     const dot=priceDot(p.ticker);
-
-    return `<div class="pos-card" id="card-${p.id}" style="--card-color:${cfg.color}">
-      <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:${cfg.color};border-radius:10px 0 0 10px"></div>
-      <div class="card-header">
-        <div>
-          <div class="card-ticker">${p.ticker}</div>
-          <div class="card-account">${p.account}</div>
+    return `<tr>
+      <td><span class="cticker">${p.ticker}</span></td>
+      <td class="mt-num">
+        <input style="background:transparent;border:1px solid transparent;border-radius:3px;padding:2px 4px;color:var(--text);font-family:var(--mono);font-size:12px;width:70px;text-align:right;outline:none;"
+          type="number" step="any" value="${p.shares??''}" placeholder="—"
+          onfocus="this.style.borderColor='var(--accent)';this.style.background='var(--surface2)'"
+          onblur="this.style.borderColor='transparent';this.style.background='transparent'"
+          onchange="updField(${p.id},'shares',this.value)">
+      </td>
+      <td>
+        <div class="mt-price-wrap">
+          <span class="mt-price">${fP(p.price)}</span>
+          ${dot}
         </div>
-        <span class="card-action ${aCls}" onclick="cycleAction(${p.id})" style="cursor:pointer">${aLbl}</span>
-      </div>
-      <div class="card-value">${fD(p.value)}</div>
-      <div class="card-price-row">
-        <span class="card-price">${fP(p.price)}</span>
-        ${dot}
-        <span class="card-price" style="color:var(--muted)">${fS(p.shares)} shares</span>
-      </div>
-      <div class="card-pl ${plUC}">${plTxt}</div>
-      <div class="card-footer">
-        <span class="card-pct">${pct}% of portfolio</span>
-        <span class="card-bucket ${cfg.cls}">${p.bucket}</span>
-      </div>
-      <!-- Expandable detail -->
-      <div class="card-expand" id="expand-${p.id}">
-        <div class="card-row">
-          <span class="card-row-label">Shares</span>
-          <input class="card-edit" type="number" step="any" value="${p.shares??''}" placeholder="—" onchange="updField(${p.id},'shares',this.value)">
-        </div>
-        <div class="card-row">
-          <span class="card-row-label">Cost Basis</span>
-          <input class="card-edit" type="number" step="any" value="${p.cost_basis??''}" placeholder="—" onchange="updField(${p.id},'cost_basis',this.value)">
-        </div>
-        <textarea class="card-note" rows="2" placeholder="Notes…" onchange="updField(${p.id},'notes',this.value)">${p.notes||''}</textarea>
-        <button class="card-del" onclick="delPos(${p.id})">Remove Position</button>
-      </div>
-    </div>`;
+      </td>
+      <td class="mt-num" style="color:var(--text);font-weight:500">${fD(p.value)}</td>
+      <td><span class="atog ${aCls}" onclick="cycleAction(${p.id})" style="font-size:8px;padding:3px 8px">${aLbl}</span></td>
+      <td>
+        <textarea class="mt-note" rows="1" placeholder="Note…"
+          onchange="updField(${p.id},'notes',this.value)"
+          onfocus="rz(this)" onblur="rz(this)">${p.notes||''}</textarea>
+      </td>
+    </tr>`;
   }).join('');
 
-  // Tap card body (not controls) to expand/collapse
-  grid.querySelectorAll('.pos-card').forEach(card=>{
-    card.addEventListener('click', e=>{
-      if(e.target.closest('.card-expand,.card-action,.card-del,.card-edit,.card-note')) return;
-      const id=card.id.replace('card-','');
-      const exp=document.getElementById(`expand-${id}`);
-      exp.classList.toggle('open');
-    });
-  });
+  tbody.querySelectorAll('.mt-note').forEach(rz);
+}
+
+function renderMobile(){
+  renderMobileSummary();
+  renderMobileBuckets();
+  renderMobileTable();
 }
 
 // ─── INLINE EDITS ────────────────────────────────────────────────────────────
@@ -861,14 +924,14 @@ async function updField(id,field,rawVal){
   p[field]=rawVal===''||rawVal===null?null:(field==='notes'?rawVal:parseFloat(rawVal));
   compute(p);
   renderSummary(); renderAllocBar(); renderBuckets();
-  if(isMobileView) renderCards(); else renderTable();
+  if(isMobileView){ renderMobileSummary(); renderMobileTable(); } else renderTable();
   try{ await sbPatch('positions',id,{[field]:p[field]}); }
   catch(e){ toast(`Save failed: ${e.message}`,'err'); }
 }
 async function cycleAction(id){
   const p=positions.find(p=>p.id===id); if(!p) return;
   p.action=ACT_CYCLE[(ACT_CYCLE.indexOf(p.action)+1)%ACT_CYCLE.length];
-  if(isMobileView) renderCards(); else renderTable();
+  if(isMobileView) renderMobileTable(); else renderTable();
   try{ await sbPatch('positions',id,{action:p.action}); }
   catch(e){ toast(`Save failed: ${e.message}`,'err'); }
 }
@@ -939,11 +1002,11 @@ function updateUpdatedInfo(){
 function renderAll(){
   renderSummary(); renderAllocBar(); renderBuckets();
   renderFilters(); updateUpdatedInfo();
-  if(isMobileView){ renderCards(); }
+  if(isMobileView){ renderMobile(); }
   else { renderThead(); renderTable(); buildColDd(); }
 }
 
-document.getElementById('search').addEventListener('input',e=>{ searchQ=e.target.value.trim(); isMobileView?renderCards():renderTable(); });
+document.getElementById('search').addEventListener('input',e=>{ searchQ=e.target.value.trim(); isMobileView?renderMobileTable():renderTable(); });
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
 (async()=>{
