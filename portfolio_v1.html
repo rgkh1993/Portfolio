@@ -778,9 +778,9 @@ function priceDot(ticker){
 // ─── COLUMN RESIZE ───────────────────────────────────────────────────────────
 let _rsz=null;
 let colWidths=JSON.parse(localStorage.getItem('pt_colwidths')||'{}');
-let colWidthsMobile=JSON.parse(localStorage.getItem('pt_colwidths_m')||'{}');
+let colWidthsMobile=JSON.parse(localStorage.getItem('pt_colwidths_m2')||'{}');
 const MCOLS=[
-  {label:'Ticker',r:false,sort:'ticker'},{label:'Qty',r:true,sort:'shares',w:80},{label:'Price',r:true,sort:'price',w:80},
+  {label:'Ticker',r:false,sort:'ticker',w:80},{label:'Price',r:true,sort:'price',w:80},
   {label:'Value',r:true,sort:'value',w:72},{label:'Action',r:false,sort:'action'},{label:'Notes',r:false,sort:null},
 ];
 function renderMobileThead(){
@@ -826,7 +826,7 @@ function onRszEnd(){
   if(!_rsz) return;
   if(_rsz.mobile){
     colWidthsMobile[_rsz.ci]=_rsz.th.offsetWidth;
-    localStorage.setItem('pt_colwidths_m',JSON.stringify(colWidthsMobile));
+    localStorage.setItem('pt_colwidths_m2',JSON.stringify(colWidthsMobile));
   } else {
     colWidths[_rsz.ci]=_rsz.th.offsetWidth;
     localStorage.setItem('pt_colwidths',JSON.stringify(colWidths));
@@ -983,13 +983,6 @@ function renderMobileTable(){
     const dot=priceDot(p.ticker);
     return `<tr>
       <td><span class="cticker">${p.ticker}</span></td>
-      <td class="mt-num">
-        <input style="background:transparent;border:1px solid transparent;border-radius:3px;padding:2px 4px;color:var(--text);font-family:var(--mono);font-size:12px;width:56px;text-align:right;outline:none;"
-          type="number" step="any" value="${p.shares??''}" placeholder="—"
-          onfocus="this.style.borderColor='var(--accent)';this.style.background='var(--surface2)'"
-          onblur="this.style.borderColor='transparent';this.style.background='transparent'"
-          onchange="updField(${p.id},'shares',this.value)">
-      </td>
       <td class="mt-num">
         <div class="mt-price-wrap">
           <span class="mt-price">${fP(p.price)}</span>
