@@ -217,9 +217,10 @@ tr:last-child td{border-bottom:none;}
 /* Mobile table cells */
 .mt-ticker{font-family:var(--mono);font-weight:600;font-size:13px;color:var(--text);}
 .mt-sub{font-family:var(--mono);font-size:9px;color:var(--muted2);margin-top:1px;}
-.mt-num{font-family:var(--mono);font-size:12px;text-align:right;color:var(--text);}
+.mt-num{font-family:var(--mono);font-size:12px;text-align:right;color:var(--text);padding:11px 6px;}
 .mt-price{font-family:var(--mono);font-size:12px;text-align:right;color:var(--muted2);}
 .mt-price-wrap{display:flex;align-items:center;justify-content:flex-end;gap:5px;}
+.mobile-table-wrap th.r{padding-left:6px;padding-right:6px;}
 
 /* Mobile note input */
 .mt-note{width:100%;min-width:120px;background:transparent;border:1px solid transparent;border-radius:3px;padding:3px 5px;color:var(--muted2);font-family:var(--sans);font-size:11px;resize:none;outline:none;transition:all 0.15s;line-height:1.4;min-height:22px;}
@@ -504,6 +505,7 @@ function fD(v){
 }
 function fS(v){ if(v===null||v===undefined) return '—'; if(v<1) return v.toFixed(6); return v>=10000?v.toLocaleString('en-US'):String(v); }
 function fP(v){ if(v===null||v===undefined) return '—'; if(v<1) return '$'+v.toFixed(4); return '$'+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fDI(v){ if(v===null||v===undefined) return '—'; const neg=v<0,a=Math.abs(v); const s=a>=1000000?'$'+(a/1000000).toFixed(1)+'M':'$'+Math.round(a).toLocaleString('en-US'); return neg?'−'+s:s; }
 
 // ─── TOAST ───────────────────────────────────────────────────────────────────
 let _tt;
@@ -778,8 +780,8 @@ let _rsz=null;
 let colWidths=JSON.parse(localStorage.getItem('pt_colwidths')||'{}');
 let colWidthsMobile=JSON.parse(localStorage.getItem('pt_colwidths_m')||'{}');
 const MCOLS=[
-  {label:'Ticker',r:false,sort:'ticker'},{label:'Qty',r:true,sort:'shares'},{label:'Price',r:true,sort:'price'},
-  {label:'Value',r:true,sort:'value'},{label:'Action',r:false,sort:'action'},{label:'Notes',r:false,sort:null},
+  {label:'Ticker',r:false,sort:'ticker'},{label:'Qty',r:true,sort:'shares',w:80},{label:'Price',r:true,sort:'price',w:80},
+  {label:'Value',r:true,sort:'value',w:72},{label:'Action',r:false,sort:'action'},{label:'Notes',r:false,sort:null},
 ];
 function renderMobileThead(){
   document.getElementById('mobile-thead').innerHTML='<tr>'+MCOLS.map((c,i)=>{
@@ -792,7 +794,7 @@ function renderMobileThead(){
       <div class="col-rsz" onmousedown="startMobileResize(event,this.parentElement,${i})" ontouchstart="startMobileResize(event,this.parentElement,${i})"></div>
     </th>`;
   }).join('')+'</tr>';
-  document.querySelectorAll('#mobile-thead th').forEach((th,i)=>{ const w=colWidthsMobile[i]; if(w){th.style.minWidth=w+'px';th.style.width=w+'px';} });
+  document.querySelectorAll('#mobile-thead th').forEach((th,i)=>{ const w=colWidthsMobile[i]||MCOLS[i].w; if(w){th.style.minWidth=w+'px';th.style.width=w+'px';} });
 }
 function startMobileResize(e,th,ci){
   e.preventDefault(); e.stopPropagation();
@@ -982,19 +984,19 @@ function renderMobileTable(){
     return `<tr>
       <td><span class="cticker">${p.ticker}</span></td>
       <td class="mt-num">
-        <input style="background:transparent;border:1px solid transparent;border-radius:3px;padding:2px 4px;color:var(--text);font-family:var(--mono);font-size:12px;width:70px;text-align:right;outline:none;"
+        <input style="background:transparent;border:1px solid transparent;border-radius:3px;padding:2px 4px;color:var(--text);font-family:var(--mono);font-size:12px;width:56px;text-align:right;outline:none;"
           type="number" step="any" value="${p.shares??''}" placeholder="—"
           onfocus="this.style.borderColor='var(--accent)';this.style.background='var(--surface2)'"
           onblur="this.style.borderColor='transparent';this.style.background='transparent'"
           onchange="updField(${p.id},'shares',this.value)">
       </td>
-      <td>
+      <td class="mt-num">
         <div class="mt-price-wrap">
           <span class="mt-price">${fP(p.price)}</span>
           ${dot}
         </div>
       </td>
-      <td class="mt-num" style="color:var(--text);font-weight:500">${fD(p.value)}</td>
+      <td class="mt-num" style="color:var(--text);font-weight:500">${fDI(p.value)}</td>
       <td><span class="atog ${aCls}" onclick="cycleAction(${p.id})" style="font-size:8px;padding:3px 8px">${aLbl}</span></td>
       <td>
         <textarea class="mt-note" rows="1" placeholder="Note…"
