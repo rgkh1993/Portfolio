@@ -889,7 +889,7 @@ function renderTable(){
           ${priceDot(p.ticker)}
         </div>
       </td>
-      <td data-ci="6" class="cnum bold">${fD(p.value)}</td>
+      <td data-ci="6" class="cnum bold">${['Cash','Home'].includes(p.bucket)?`<input class="editable" type="number" step="any" value="${p.fixed_value??p.value??''}" placeholder="0" onchange="updField(${p.id},'fixed_value',this.value)">`:fD(p.value)}</td>
       <td data-ci="7"><div class="pbar-wrap"><div class="pbar"><div class="pbar-fill" style="width:${barW}%;background:${cfg.color}"></div></div><span class="pbar-label">${pct.toFixed(1)}%</span></div></td>
       <td data-ci="8" style="text-align:right"><input class="editable dim" type="number" step="any" value="${p.cost_basis??''}" placeholder="—" onchange="updField(${p.id},'cost_basis',this.value)"></td>
       <td data-ci="9"  class="cnum ${plUC}">${p.pl_usd!=null?(p.pl_usd>=0?'+':'')+fD(p.pl_usd):'—'}</td>
@@ -989,7 +989,7 @@ function renderMobileTable(){
           ${dot}
         </div>
       </td>
-      <td class="mt-num" style="color:var(--text);font-weight:500">${fDI(p.value)}</td>
+      <td class="mt-num" style="color:var(--text);font-weight:500">${['Cash','Home'].includes(p.bucket)?`<input style="background:transparent;border:1px solid transparent;border-radius:3px;padding:2px 4px;color:var(--text);font-family:var(--mono);font-size:12px;width:64px;text-align:right;outline:none;font-weight:500;" type="number" step="any" value="${p.fixed_value??p.value??''}" placeholder="0" onfocus="this.style.borderColor='var(--accent)';this.style.background='var(--surface2)'" onblur="this.style.borderColor='transparent';this.style.background='transparent'" onchange="updField(${p.id},'fixed_value',this.value)">`:fDI(p.value)}</td>
       <td><span class="atog ${aCls}" onclick="cycleAction(${p.id})" style="font-size:8px;padding:3px 8px">${aLbl}</span></td>
       <td>
         <textarea class="mt-note" rows="1" placeholder="Note…"
