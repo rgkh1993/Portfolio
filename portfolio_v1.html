@@ -131,6 +131,12 @@ tr:last-child td{border-bottom:none;}
 .editable:focus{border-color:var(--accent);background:var(--surface2);}
 .editable.dim{color:var(--muted2);}
 .editable.dim:focus{color:var(--text);}
+.editable-txt{font-family:var(--mono);font-size:11px;color:var(--text);background:transparent;border:1px solid transparent;border-radius:3px;padding:2px 5px;width:100%;min-width:60px;outline:none;transition:all 0.15s;}
+.editable-txt:hover{border-color:var(--border2);}
+.editable-txt:focus{border-color:var(--accent);background:var(--surface2);}
+.editable-sel{font-family:var(--mono);font-size:9px;letter-spacing:0.05em;color:var(--text);background:transparent;border:1px solid transparent;border-radius:3px;padding:2px 4px;outline:none;cursor:pointer;transition:all 0.15s;}
+.editable-sel:hover{border-color:var(--border2);background:var(--surface);}
+.editable-sel:focus{border-color:var(--accent);background:var(--surface2);}
 
 /* BUCKET TAG */
 .btag{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;letter-spacing:0.07em;padding:3px 7px;border-radius:3px;border:1px solid;white-space:nowrap;}
@@ -880,9 +886,9 @@ function renderTable(){
     const plPC=p.pl_pct!=null?(p.pl_pct>=0?'green':'red'):'';
     return `<tr>
       <td data-ci="0"><span class="cticker">${p.ticker}</span></td>
-      <td data-ci="1"><span class="cacct">${p.account}</span></td>
-      <td data-ci="2"><span class="btag ${cfg.cls}"><span class="bdot" style="background:${cfg.color}"></span>${p.bucket}</span></td>
-      <td data-ci="3" style="color:var(--muted2);font-size:11px">${p.type||''}</td>
+      <td data-ci="1"><input class="editable-txt" type="text" value="${p.account||''}" placeholder="Account" onchange="updField(${p.id},'account',this.value)"></td>
+      <td data-ci="2"><select class="editable-sel" onchange="updField(${p.id},'bucket',this.value)">${Object.keys(BC).map(b=>`<option value="${b}"${p.bucket===b?' selected':''}>${b}</option>`).join('')}</select></td>
+      <td data-ci="3"><input class="editable-txt" type="text" value="${p.type||''}" placeholder="—" style="color:var(--muted2)" onchange="updField(${p.id},'type',this.value)"></td>
       <td data-ci="4" style="text-align:right"><input class="editable" type="number" step="any" value="${p.shares??''}" placeholder="—" onchange="updField(${p.id},'shares',this.value)"></td>
       <td data-ci="5">
         <div class="price-cell">
@@ -1013,7 +1019,7 @@ function renderMobile(){
 // ─── INLINE EDITS ────────────────────────────────────────────────────────────
 async function updField(id,field,rawVal){
   const p=positions.find(p=>p.id===id); if(!p) return;
-  p[field]=rawVal===''||rawVal===null?null:(field==='notes'?rawVal:parseFloat(rawVal));
+  p[field]=rawVal===''||rawVal===null?null:(['notes','account','bucket','type'].includes(field)?rawVal:parseFloat(rawVal));
   compute(p);
   renderSummary(); renderAllocBar(); renderBuckets();
   if(isMobileView){ renderMobileSummary(); renderMobileTable(); } else renderTable();
