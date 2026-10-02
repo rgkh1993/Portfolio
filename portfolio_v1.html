@@ -71,6 +71,7 @@ header{padding:14px 24px;border-bottom:1px solid var(--border);display:flex;alig
 .alloc-bar{display:flex;height:3px;}
 .alloc-seg{height:100%;}
 .slabel-row{font-family:var(--mono);font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding:10px 24px 0;}
+.acct-row{display:flex;gap:1px;background:var(--border);border-bottom:1px solid var(--border);overflow-x:auto;}
 .bucket-row{display:flex;gap:1px;background:var(--border);border-bottom:1px solid var(--border);overflow-x:auto;}
 .bpill{flex:1;min-width:82px;background:var(--surface);padding:10px 12px;cursor:pointer;transition:background 0.15s;border-top:2px solid transparent;white-space:nowrap;}
 .bpill:hover{background:var(--surface2);}
@@ -337,6 +338,7 @@ th{position:relative;}
 </header>
 
 <div class="summary-bar" id="summary-bar"></div>
+<div class="acct-row" id="acct-row" style="display:none"></div>
 <div class="alloc-bar" id="alloc-bar"></div>
 <div class="slabel-row">Allocation by Bucket</div>
 <div class="bucket-row" id="bucket-row"></div>
@@ -485,7 +487,7 @@ let priceStatus = {}; // ticker -> 'ok'|'err'|'none'
 let colVis      = JSON.parse(localStorage.getItem('pt_colvis5')||'{}');
 let sortCol     = 'value', sortDir = -1;
 let mobileSortCol = 'value', mobileSortDir = -1;
-let filterB     = 'all', searchQ = '';
+let filterB='all', filterA='all', searchQ='';
 let lastUpdated = null, editingId = null;
 let isMobileView = window.innerWidth <= 430; // auto-detect on load
 
@@ -677,6 +679,7 @@ function applyView(){
   const allocBar=document.getElementById('alloc-bar');
   const slabelRow=document.querySelector('.slabel-row');
   const bucketRow=document.getElementById('bucket-row');
+  const acctRow=document.getElementById('acct-row');
   if(isMobileView){
     twrap.classList.add('hidden');
     mv.classList.add('active');
@@ -688,6 +691,7 @@ function applyView(){
     allocBar.style.display='none';
     slabelRow.style.display='none';
     bucketRow.style.display='none';
+    acctRow.style.display='none';
     renderMobile();
   } else {
     twrap.classList.remove('hidden');
@@ -700,6 +704,7 @@ function applyView(){
     allocBar.style.display='';
     slabelRow.style.display='';
     bucketRow.style.display='';
+    renderAccounts();
     renderTable();
   }
 }
@@ -707,6 +712,22 @@ function applyView(){
 // ─── TOTALS ──────────────────────────────────────────────────────────────────
 function getTotal(){ return positions.reduce((s,p)=>s+(p.value||0),0); }
 function getBT(){ const bt={}; positions.forEach(p=>{ if(p.value) bt[p.bucket]=(bt[p.bucket]||0)+p.value; }); return bt; }
+function getAT(){ const at={}; positions.forEach(p=>{ if(p.value&&p.account) at[p.account]=(at[p.account]||0)+p.value; }); return at; }
+
+function renderAccounts(){
+  const T=getTotal(), at=getAT();
+  const entries=Object.entries(at).sort((a,b)=>b[1]-a[1]);
+  const el=document.getElementById('acct-row');
+  if(entries.length<=1){ el.style.display='none'; return; }
+  el.style.display='';
+  el.innerHTML=entries.map(([a,v])=>{
+    const pct=((v/T)*100).toFixed(1), isA=filterA===a;
+    const aEsc=a.replace(/'/g,"\\'");
+    return `<div class="bpill${isA?' active':''}" onclick="clickAccount('${aEsc}')" style="border-top-color:${isA?'var(--accent)':'transparent'}">
+      <div class="bname" style="color:${isA?'var(--accent)':'var(--muted2)'}">${a}</div><div class="bval">${fD(v)}</div><div class="bpct">${pct}%</div></div>`;
+  }).join('');
+}
+function clickAccount(a){ filterA=(filterA===a)?'all':a; renderAll(); }
 
 // ─── SUMMARY ─────────────────────────────────────────────────────────────────
 function renderSummary(){
@@ -850,6 +871,7 @@ function onRszEnd(){
 function getFiltered(){
   let d=[...positions];
   if(filterB!=='all') d=d.filter(p=>p.bucket===filterB);
+  if(filterA!=='all') d=d.filter(p=>p.account===filterA);
   if(searchQ){ const q=searchQ.toLowerCase(); d=d.filter(p=>[p.ticker,p.account,p.bucket,p.type].some(s=>(s||'').toLowerCase().includes(q))); }
   d.sort((a,b)=>{
     let av=a[sortCol],bv=b[sortCol];
@@ -967,6 +989,7 @@ function doMobileSort(col){
 function renderMobileTable(){
   let data=[...positions];
   if(filterB!=='all') data=data.filter(p=>p.bucket===filterB);
+  if(filterA!=='all') data=data.filter(p=>p.account===filterA);
   if(searchQ){ const q=searchQ.toLowerCase(); data=data.filter(p=>[p.ticker,p.account,p.bucket].some(s=>(s||'').toLowerCase().includes(q))); }
   data.sort((a,b)=>{
     let av=a[mobileSortCol],bv=b[mobileSortCol];
@@ -1098,7 +1121,7 @@ function updateUpdatedInfo(){
 
 // ─── RENDER ALL ──────────────────────────────────────────────────────────────
 function renderAll(){
-  renderSummary(); renderAllocBar(); renderBuckets();
+  renderSummary(); renderAccounts(); renderAllocBar(); renderBuckets();
   renderFilters(); updateUpdatedInfo();
   if(isMobileView){ renderMobile(); }
   else { renderThead(); renderTable(); buildColDd(); }
