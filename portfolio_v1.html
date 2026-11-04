@@ -615,7 +615,7 @@ async function refreshPrices(){
           const w=await r.json();
           const d=JSON.parse(w.contents);
           const meta=d?.chart?.result?.[0]?.meta;
-          const price=meta?.regularMarketPrice??meta?.previousClose;
+          const price=meta?.postMarketPrice??meta?.preMarketPrice??meta?.regularMarketPrice??meta?.previousClose;
           if(price&&price>0) priceMap[ticker]=price;
         } catch(_){ console.warn('Fallback failed for',ticker); }
       }),
